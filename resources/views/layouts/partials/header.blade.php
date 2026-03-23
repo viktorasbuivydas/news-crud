@@ -1,9 +1,13 @@
 <header class="bg-white border-b border-gray-200">
     <div class="max-w-6xl mx-auto px-4 py-5 flex items-center justify-between">
-        <a href="{{ route('articles.index') }}" class="text-xl font-bold tracking-tight">News</a>
+        @auth
+            <a href="{{ route('dashboard.articles.index') }}" class="text-xl font-bold tracking-tight">News</a>
+        @else
+            <a href="{{ route('articles.index') }}" class="text-xl font-bold tracking-tight">News</a>
+        @endauth
         <div class="flex items-center gap-4">
             @auth
-                <a href="{{ route('articles.create') }}"
+                <a href="{{ route('dashboard.articles.create') }}"
                     class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors">
                     New Article
                 </a>
