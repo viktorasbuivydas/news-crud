@@ -1,58 +1,78 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# News CRUD
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A news article management application built with Laravel 13, PHP 8.3, and Tailwind CSS v4. Authenticated users can create, edit, soft-delete, restore, and permanently delete articles. Public visitors can browse and read published articles.
 
-## About Laravel
-
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Installation
 
 ```bash
-composer require laravel/boost --dev
+# Clone the repository
+git clone https://github.com/viktorasbuivydas/news-crud.git
+cd news-crud
 
-php artisan boost:install
+# Install dependencies
+composer install
+npm install
+
+# Environment setup
+cp .env.example .env
+php artisan key:generate
+
+# Database setup
+php artisan migrate
+
+Command down bellow will seed 100 articles
+php artisan db:seed --class=ArticleSeeder
+
+# Build frontend assets
+npm run build
+
+# Start the application
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+For development with hot-reloading, run `npm run dev` in a separate terminal instead of `npm run build`.
 
-## Contributing
+### Default Test Credentials
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+You can easily register an acount
 
-## Code of Conduct
+## Features
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- **Public article listing** with pagination
+- **User authentication** (login, register, logout)
+- **Full CRUD** for articles behind authenticated dashboard
+- **Soft deletes** with restore and permanent delete options
+- **Article filtering** by published/trashed status in dashboard
+- **Form validation** via dedicated Form Request classes
+- **Service layer** (`ArticleService`) for business logic separation
 
-## Security Vulnerabilities
+## Project Structure
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+The application separates public-facing pages from the authenticated dashboard:
 
-## License
+- `ArticleController` — handles public article listing and viewing at `/` and `/articles/{article}`
+- `DashboardArticleController` — handles full CRUD at `/dashboard/articles/*` (requires auth)
+- `AuthController` — login, register, logout
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The dashboard and public index views are intentionally separated into distinct controllers and view directories for easier maintainability.
+
+## Tech Stack
+
+| Layer      | Technology                    |
+|------------|-------------------------------|
+| Backend    | Laravel 13, PHP 8.3          |
+| Frontend   | Blade, Tailwind CSS v4, Vite |
+| Database   | SQLite (default)             |
+| Testing    | Pest v4                      |
+| Auth       | Laravel session-based        |
+
+## Suggested Improvements
+
+- **Policies and authorization** — Currently any authenticated user can edit or delete any article. Laravel Policies should be added to ensure users can only edit and delete their own articles. This requires adding a `user_id` foreign key to the `articles` table and creating an `ArticlePolicy` with `update`, `delete`, `restore`, and `forceDelete` gates.
+- **User roles** — Introduce roles (e.g. admin, editor, author) for managing articles. Admins could manage all articles while authors are restricted to their own. A package like `spatie/laravel-permission` or a simple role column on the `users` table would support this.
+- **Ensure users can only edit their own articles** — Tie articles to their author via a `user_id` column, then use a policy to scope edit/delete actions to the owning user (or admin role).
+- **API resources** — Add Eloquent API Resources for a potential REST API layer.
+- **Testing coverage** — Expand Pest feature tests covering article CRUD operations, authorization, and edge cases.
+- **Image/media uploads** — Support featured images or inline media for articles.
+- **Article status workflow** — Add draft/published/archived statuses beyond the current soft-delete approach.
+- **Search** — Full-text search across article titles and content.
