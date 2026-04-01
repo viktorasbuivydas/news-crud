@@ -11,12 +11,12 @@ class ArticleService
     public function list(?ArticleFilter $filter = ArticleFilter::Published): LengthAwarePaginator
     {
         return Article::query()
-            ->when($filter === ArticleFilter::Trashed, fn ($query) => $query->onlyTrashed())
+            ->when($filter === ArticleFilter::Trashed, fn($query) => $query->onlyTrashed())
             ->latest()
             ->paginate();
     }
 
-    public function find(string $id, bool $withTrashed = false): Article
+    public function find(int $id, bool $withTrashed = false): Article
     {
         return $withTrashed
             ? Article::withTrashed()->findOrFail($id)
@@ -28,7 +28,7 @@ class ArticleService
         return Article::query()->create($data);
     }
 
-    public function update(string $id, array $data): Article
+    public function update(int $id, array $data): Article
     {
         $article = Article::withTrashed()->findOrFail($id);
         $article->update($data);
@@ -41,7 +41,7 @@ class ArticleService
         $article->delete();
     }
 
-    public function restore(string $id): Article
+    public function restore(int $id): Article
     {
         $article = Article::onlyTrashed()->findOrFail($id);
         $article->restore();
@@ -49,7 +49,7 @@ class ArticleService
         return $article;
     }
 
-    public function forceDelete(string $id): void
+    public function forceDelete(int $id): void
     {
         $article = Article::onlyTrashed()->findOrFail($id);
         $article->forceDelete();
